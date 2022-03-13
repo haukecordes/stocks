@@ -159,7 +159,7 @@ def use_data(symbol, data):
     return sorted_data
 
 
-def use_infos(symbol, data):
+def use_infos(symbol, data, time_period):
     data = data[symbol]
 
     try:
@@ -173,7 +173,10 @@ def use_infos(symbol, data):
     price = data["last"]
     key = list(data["Basic-EPS"].keys())[-1]
     earnings_per_share_ttm = data["Basic-EPS"][key]
-    pe = round(float(str(price).replace("$", "")) / float(str(earnings_per_share_ttm).replace("$", "")), 3)
+    pe = round(float(str(price).replace("$", "")) /
+               float(str(earnings_per_share_ttm).replace("$", "").replace("(", "-").replace(")", "")), 3)
+    if not time_period == "annual":
+        pe *= (1 / 4)
     sorted_infos = [[symbol, price, pe, company, sector, ind, exc]]
     return sorted_infos
 
@@ -240,7 +243,7 @@ while True:
 
             # use data for calculation
             comparison[f"{symbol}"] = use_data(symbol, symbol_data)
-            short_comparison[f"{symbol}"] = use_infos(symbol, symbol_data)
+            short_comparison[f"{symbol}"] = use_infos(symbol, symbol_data, period)
 
     except IndexError as e:
         raise Exception("Wanted Data was not at expected position!\n", e)
