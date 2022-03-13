@@ -8,9 +8,12 @@ import webbrowser
 # not preinstalled
 from requests import get
 from pandas import read_csv
+from keyboard import press_and_release
 
 
 def trick_detection(url):
+    global TABS
+    TABS += 1
     webbrowser.open(url, new=0)
     counter = 25
     while True:
@@ -213,6 +216,7 @@ def get_time_period():
 
 # main stuff
 while True:
+    TABS = 0
     symbols = get_symbols()
     comparison = {}
     short_comparison = {}
@@ -287,7 +291,10 @@ while True:
     read_short = read_csv(f'CSV Files/{period}-short_comparison.csv')
     read_short.to_excel(f'Excel Files/ShortComparison-{period}-{symbols_as_str}.xlsx', index=None, header=True)
 
-    print("\n#####\nYour Excel Worksheets have been created. You can find them in the 'Excel Files' folder. :)\n"
-          "(all browser tabs are no longer needed)\n#####")
+    for i in range(TABS):
+        press_and_release('ctrl+w')
+    print(f"closed {TABS} browser tabs")
+
+    print("\n#####\nYour Excel Worksheets have been created. You can find them in the 'Excel Files' folder. :)")
 
     input("\n Hit enter to restart...")
