@@ -3,11 +3,11 @@ import csv
 import json
 import os
 import time
+import webbrowser
 
 # not preinstalled
-import requests
-import webbrowser
-import pandas as pd
+from requests import get
+from pandas import read_csv
 
 
 def trick_detection(url):
@@ -15,7 +15,7 @@ def trick_detection(url):
     counter = 25
     while True:
         counter -= 1
-        if str(requests.get(url)) == "<Response [200]>":
+        if str(get(url)) == "<Response [200]>":
             break
         else:
             time.sleep(.2)
@@ -41,7 +41,7 @@ def get_data(symbol, side, time_period):
 
     if not os.path.exists(f"Json Files/{symbol}-{time_period}-{side}.json"):
         trick_detection(url)
-        response = requests.get(url)
+        response = get(url)
         data = response.json()
 
         print(f"Data for {symbol}-{time_period}-{side} collected")
@@ -190,9 +190,11 @@ def get_symbols():
         try:
             sym = str(input("Stock symbol: ")).upper().strip()
         except ValueError:
-            raise Exception("Enter a valid stock symbol!")
-        if sym == "":
+            print("Enter a valid stock symbol!")
+        if sym == "" and syms:
             return syms
+        elif sym == "":
+            print("Enter a valid stock symbol!")
         else:
             syms.append(sym)
 
@@ -279,13 +281,13 @@ while True:
             symbols_as_str += "--" + str(sym)
     symbols_as_str += ")"
 
-    read_long = pd.read_csv(f'CSV Files/{period}-comparison.csv')
+    read_long = read_csv(f'CSV Files/{period}-comparison.csv')
     read_long.to_excel(f'Excel Files/FundamentalsComparison-{period}-{symbols_as_str}.xlsx', index=None, header=True)
 
-    read_short = pd.read_csv(f'CSV Files/{period}-short_comparison.csv')
+    read_short = read_csv(f'CSV Files/{period}-short_comparison.csv')
     read_short.to_excel(f'Excel Files/ShortComparison-{period}-{symbols_as_str}.xlsx', index=None, header=True)
 
-    print("Your Excel Worksheets have been created. You can find them in the 'Excel Files' folder. :)")
+    print("\n#####\nYour Excel Worksheets have been created. You can find them in the 'Excel Files' folder. :)\n"
+          "(all browser tabs are no longer needed)\n#####")
 
     input("\n Hit enter to restart...")
-    input("--------")
